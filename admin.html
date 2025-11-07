@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel Administrativo</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+  /* ============================================================
+   💗 APPLE PINK CRM PANEL — Glass Dashboard Style
+   Autor: KINEL MIN x GPT-5
+   Reemplazar TODO el bloque <style> anterior por este
+   ============================================================ */
+
+/* RESET */
+*,
+*::before,
+*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* VARIABLES */
+:root{
+  --pink: #ffb6c1;
+  --pink-strong: #ff69b4;
+  --bg-0: #eef2fb;           /* very light backdrop for card containers (soft) */
+  --bg-dark: #0f1220;        /* app dark background */
+  --panel: rgba(255,255,255,0.04);
+  --glass-border: rgba(255,255,255,0.12);
+  --muted: rgba(255,255,255,0.72);
+  --muted-2: rgba(255,255,255,0.5);
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow-1: 0 6px 18px rgba(7,10,20,0.55);
+  --transition: 240ms cubic-bezier(.2,.9,.3,1);
+  --font-main: "Poppins", "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+/* BASE */
+html,body{height:100%}
+body{
+  font-family: var(--font-main);
+  background: linear-gradient(180deg, #0d0f1b 0%, #0c0d14 100%);
+  color: #fff;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  display:flex;
+  min-height:100vh;
+  overflow:hidden;
+}
+
+/* ------------------------------
+   LAYOUT: SIDEBAR / MAIN
+   ------------------------------ */
+#admin-panel.active,
+.admin-shell { /* a wrapper if you want to add around admin-panel via JS */
+  display:flex;
+  width:100%;
+  height:100vh;
+}
+
+/* If admin-panel is the main container, style to behave as shell */
+.admin-panel {
+  display:flex;
+  width:100%;
+  height:100vh;
+  gap: 24px;
+  padding: 24px;
+  align-items: stretch;
+  justify-content: center;
+  background: transparent;
+}
+
+/* SIDEBAR */
+.sidebar {
+  width: 84px;                       /* compact like image */
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.04);
+  padding: 18px 12px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:14px;
+  box-shadow: var(--shadow-1);
+  flex-shrink:0;
+}
+
+/* logo circle */
+.sidebar .logo {
+  width:48px; height:48px; border-radius:12px;
+  display:flex; align-items:center; justify-content:center;
+  background: linear-gradient(135deg,var(--pink-strong),var(--pink));
+  color:#111; font-weight:700;
+  box-shadow: 0 6px 18px rgba(255,182,193,0.06);
+}
+
+/* sidebar nav icons */
+.sidebar nav { display:flex; flex-direction:column; gap:8px; margin-top:8px; width:100%; }
+.sidebar nav a{
+  width:100%; display:flex; align-items:center; justify-content:center;
+  height:44px; border-radius:10px; text-decoration:none; color:var(--muted);
+  transition: all var(--transition);
+  border:1px solid transparent;
+}
+.sidebar nav a i{ font-size:18px; display:block; }
+.sidebar nav a.active,
+.sidebar nav a:hover{
+  background: rgba(255,182,193,0.12);
+  color: #fff;
+  transform: translateX(6px);
+  border-color: rgba(255,182,193,0.06);
+}
+
+/* MAIN AREA (RIGHT) */
+.main {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  min-width:0;
+}
+
+/* TOPBAR */
+.topbar {
+  height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 18px;
+  margin-right: 18px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 30px rgba(2,6,23,0.5);
+}
+.topbar .left { display:flex; align-items:center; gap:18px; }
+.topbar .title { font-weight:700; color:var(--pink); font-size:1.05rem; letter-spacing: -0.2px; }
+.topbar .controls { display:flex; align-items:center; gap:12px; }
+
+/* search input minimal */
+.topbar input[type="search"]{
+  width:320px; max-width:38vw; padding:10px 12px; border-radius:10px;
+  background: rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.03); color:var(--muted);
+  outline:none; transition: all var(--transition);
+}
+.topbar input[type="search"]::placeholder{ color: rgba(255,255,255,0.35); }
+
+/* user avatar area */
+.topbar .user {
+  display:flex; align-items:center; gap:12px;
+}
+.topbar .user .meta { text-align:right; font-size:0.85rem; color:var(--muted-2); }
+.topbar .user img {
+  width:44px; height:44px; border-radius:10px; object-fit:cover;
+  border: 2px solid rgba(255,255,255,0.06);
+}
+
+/* ------------------------------
+   CONTENT GRID (LEFT PANE + CALENDAR)
+   ------------------------------ */
+.content {
+  display:grid;
+  grid-template-columns: 320px 1fr; /* left column (list/cards) + big calendar area */
+  gap: 20px;
+  padding: 8px 18px 28px;
+  align-items:start;
+  overflow:auto;
+}
+
+/* LEFT PANEL (today visits + card) */
+.left-panel {
+  background: var(--panel);
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid var(--glass-border);
+  min-height: 520px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.left-panel h3 { color: var(--muted); font-size:0.95rem; margin-bottom:6px; font-weight:700; }
+.visit-item {
+  display:flex; gap:12px; align-items:center; padding:10px; border-radius:10px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));
+  border:1px solid rgba(255,255,255,0.02);
+}
+.visit-item img{ width:44px; height:44px; border-radius:10px; object-fit:cover; border:2px solid rgba(255,255,255,0.03); }
+.visit-item .meta { font-size:0.9rem; color:var(--muted); }
+.visit-item .meta .time { font-weight:700; color: #fff; display:block; font-size:0.86rem; }
+
+/* small promo box */
+.promo {
+  margin-top:auto;
+  background: linear-gradient(180deg, rgba(255,182,193,0.06), rgba(255,182,193,0.03));
+  color:#111;
+  padding:12px;
+  border-radius:10px;
+  text-align:left;
+}
+
+/* ------------------------------
+   CALENDAR AREA (big white-ish cards)
+   ------------------------------ */
+.calendar-shell {
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid var(--glass-border);
+  min-height:520px;
+  box-shadow: 0 10px 30px rgba(2,6,23,0.55);
+}
+
+/* controls for view (day/week/month) */
+.calendar-controls {
+  display:flex; gap:12px; align-items:center; justify-content:space-between; margin-bottom:14px;
+}
+.view-tabs { display:flex; gap:10px; }
+.view-tabs button {
+  background: transparent; border: 1px solid transparent; color:var(--muted-2);
+  padding:8px 12px; border-radius:8px; cursor:pointer;
+}
+.view-tabs button.active {
+  background: #fff; color:#111; font-weight:700; box-shadow: 0 6px 20px rgba(255,182,193,0.06);
+  border: 1px solid rgba(0,0,0,0.04);
+}
+
+/* month grid */
+#calendar-container {
+  display:grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap:12px;
+}
+.day-box {
+  min-height:86px;
+  border-radius:10px;
+  padding:10px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.008));
+  border: 1px solid rgba(255,255,255,0.02);
+  position:relative;
+}
+.day-box .day-num {
+  position:absolute; top:8px; right:10px; font-size:0.85rem; color:var(--muted-2);
+}
+.day-box .events { margin-top:18px; display:flex; flex-direction:column; gap:6px; }
+.event-pill {
+  display:inline-flex; align-items:center; gap:8px; padding:6px 8px; border-radius:8px;
+  font-size:0.82rem; cursor:pointer; max-width:100%;
+  box-shadow: 0 6px 18px rgba(6,8,16,0.6);
+  color:#111;
+}
+.event-pill.type-pink { background: linear-gradient(90deg,var(--pink), var(--pink-strong)); }
+.event-pill.type-blue { background: linear-gradient(90deg,#a9d1ff,#66a3ff); color:#fff; }
+.event-pill.type-gray { background: rgba(255,255,255,0.06); color:var(--muted); }
+
+/* selected day indicator */
+.day-box.today {
+  box-shadow: 0 8px 28px rgba(255,182,193,0.06);
+  border-color: rgba(255,182,193,0.12);
+}
+
+/* ------------------------------
+   TABLE / KPIS (when shown)
+   ------------------------------ */
+.admin-kpis { display:flex; gap:12px; margin-bottom:12px; }
+.kpi-card {
+  flex:1; padding:12px; border-radius:12px; background:var(--panel);
+  border: 1px solid var(--glass-border); text-align:center;
+}
+.kpi-card h3 { color:var(--muted-2); font-size:0.85rem; margin-bottom:6px; }
+.kpi-card p { font-size:1.4rem; color:var(--pink); font-weight:700; }
+
+/* table style (for the admin table you render) */
+.admin-table {
+  width:100%;
+  border-collapse:collapse;
+  margin-top:14px;
+}
+.admin-table th, .admin-table td {
+  padding:10px 12px; text-align:left;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  font-size:0.9rem; color:var(--muted);
+}
+.admin-table th { color:var(--pink); font-size:0.78rem; text-transform:uppercase; letter-spacing:0.6px; }
+
+/* ACTION BUTTONS */
+.admin-actions button {
+  background:transparent; border:1px solid rgba(255,255,255,0.03);
+  color:var(--muted); padding:6px; border-radius:8px; margin-right:6px; cursor:pointer;
+}
+.admin-actions .delete-btn { background: linear-gradient(90deg,#ff8fa0,#ff637f); color:#fff; border:none; }
+
+/* LOADING OVERLAY */
+#loading-overlay { 
+  position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+  background: linear-gradient(0deg, rgba(0,0,0,0.6), rgba(0,0,0,0.5)); z-index:3000;
+}
+#loading-overlay.hidden { display:none; }
+
+/* MODAL (login) keep but restyle to match CRM) */
+.modal {
+  position:fixed; inset:0; display:flex; align-items:center; justify-content:center;
+  background: rgba(6,8,20,0.6); z-index:4000;
+}
+.modal-content {
+  width:420px; max-width:92%; padding:22px; border-radius:14px; background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border:1px solid var(--glass-border); box-shadow: 0 18px 50px rgba(2,6,23,0.7);
+}
+.modal-content h2 { color:var(--pink); font-size:1.2rem; margin-bottom:6px; }
+.modal-subtitle { color:var(--muted-2); margin-bottom:12px; }
+.input-group input {
+  width:100%; padding:12px 14px; border-radius:10px; background: rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.03); color:var(--muted); outline:none;
+}
+.btn.primary {
+  display:inline-block; padding:10px 14px; border-radius:10px; background:linear-gradient(90deg,var(--pink-strong),var(--pink)); color:#111; font-weight:700; border:none;
+}
+
+/* tiny helpers */
+.center { display:flex; align-items:center; justify-content:center; }
+.hidden { display:none !important; }
+
+/* RESPONSIVE */
+@media (max-width: 1100px) {
+  .content { grid-template-columns: 1fr; padding: 8px; }
+  .sidebar { display:none; }
+  .topbar input[type="search"]{ width:180px; }
+  .calendar-shell, .left-panel { min-height:420px; }
+}
+@media (max-width:520px){
+  .topbar .title { font-size:1rem; }
+  .topbar input[type="search"]{ display:none; }
+  .day-box { min-height: 78px; padding:8px; }
+}
+
+/* --- Logo en el header --- */
+.title {
+  display: flex;
+  align-items: center;
+  gap: 8px;              /* Espacio si agregas texto luego */
+  height: 100%;          /* Alineación vertical perfecta */
+}
+
+.title img {
+  height: 40px;          /* Tamaño del logo (ajustable) */
+  width: auto;           /* Mantiene proporción */
+  object-fit: contain;   /* Evita deformaciones */
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2)); /* Suaviza el borde */
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Efecto sutil al pasar el mouse */
+.title img:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
+/* --- Responsivo: logo más pequeño en móviles --- */
+@media (max-width: 600px) {
+  .title img {
+    height: 32px;
+  }
+}
+
+/* --- Loader del calendario (centrado absoluto) --- */
+.calendar-loader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.4); /* oscurece fondo mientras carga */
+  backdrop-filter: blur(4px);
+  border-radius: 12px;
+  z-index: 10; /* sobre el calendario */
+}
+
+.calendar-loader::after {
+  content: "";
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255, 105, 180, 0.2);
+  border-top-color: #ff4f8b;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  box-shadow: 0 0 10px #ff4f8b, 0 0 20px #ff4f8b;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===============================
+   APPLE-STYLE LOGIN — glass pink
+   =============================== */
+
+#login-modal {
+  background: linear-gradient(135deg, #f8e7ec, #f2ecff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.login-card {
+  display: flex;
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 28px;
+  overflow: hidden;
+  max-width: 900px;
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* --------------------- IZQUIERDA --------------------- */
+.login-left {
+  flex: 1;
+  padding: 64px 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 22px;
+  color: #222;
+}
+
+.login-header h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111;
+  margin-bottom: 4px;
+  letter-spacing: -0.5px;
+}
+
+.login-header p {
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.login-header .emoji {
+  font-size: 2.2rem;
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+.login-form .input-group {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 12px 14px 12px 40px;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  outline: none;
+  font-size: 0.95rem;
+  background: rgba(255, 255, 255, 0.8);
+  transition: all 0.2s ease;
+}
+
+.login-form input:focus {
+  border-color: #ff66a8;
+  box-shadow: 0 0 0 3px rgba(255, 102, 168, 0.2);
+  background: #fff;
+}
+
+.login-form i {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+  color: #000000;
+  font-size: 0.95rem;
+}
+
+.login-form .options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 14px;
+}
+
+.login-form .options a {
+  color: #ff66a8;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.login-form .btn.primary {
+  width: 100%;
+  background: linear-gradient(135deg, #ff82b3, #ff4f91);
+  color: #fff;
+  border-radius: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 13px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s ease;
+  box-shadow: 0 6px 16px rgba(255, 102, 168, 0.3);
+}
+
+.login-form .btn.primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(255, 102, 168, 0.4);
+}
+
+.divider {
+  text-align: center;
+  color: #aaa;
+  margin: 16px 0;
+  position: relative;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: #ddd;
+}
+
+.divider::before { left: 0; }
+.divider::after { right: 0; }
+
+.social-login {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.social-login .social {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #ffe9f2;
+  transform: translateY(-2px);
+}
+ 
+
+
+
+/* --------------------- DERECHA --------------------- */
+.login-right {
+  flex: 1;
+  position: relative;
+  background: radial-gradient(circle at bottom left, #ffcce5, #ffe6f1);
+  overflow: hidden;
+}
+
+/* Burbujas rosadas animadas */
+.login-right::before,
+.login-right::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.8;
+  animation: float 6s ease-in-out infinite alternate;
+}
+
+.login-right::before {
+  width: 240px;
+  height: 240px;
+  background: #ff8ac6;
+  top: 20%;
+  left: 15%;
+}
+
+.login-right::after {
+  width: 320px;
+  height: 320px;
+  background: #ff4f91;
+  bottom: 10%;
+  right: 10%;
+  animation-delay: 2s;
+}
+
+@keyframes float {
+  from { transform: translateY(0px); }
+  to { transform: translateY(-20px); }
+}
+
+/* --------------------- Responsive --------------------- */
+@media (max-width: 768px) {
+  .login-card { flex-direction: column; border-radius: 22px; }
+  .login-right { display: none; }
+  .login-left { padding: 40px 28px; }
+}
+
+ 
+
+.login-logo {
+  transform: translateY(220%);
+  filter: brightness(0) invert(7); /* 💡 hace que todo se vea blanco */
+  
+}
+
+
+ 
+
+  </style>
+</head>
+
+<body>
+<!-- 🔐 MODAL LOGIN (compatible con tu JS: IDs intactos) -->
+<div id="login-modal" class="modal hidden">
+  <div class="modal-content login-card">
+    <!-- left: form -->
+    <div class="login-left">
+      <div class="login-header">
+        <div class="emoji">💅🏻</div>
+        <h2>Bienvenida La Coquette</h2>
+        <p class="modal-subtitle">Acceso administrativo</p>
+      </div>
+
+      <div class="login-form">
+        <div class="input-group">
+          <i class="fas fa-user"></i>
+          <input type="text" id="admin-user" placeholder="Usuario" />
+        </div>
+
+        <div class="input-group">
+          <i class="fas fa-lock"></i>
+          <input type="password" id="admin-pass" placeholder="Contraseña" />
+        </div>
+
+        <div style="display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <label style="font-size:0.85rem;color:#666;"> Olvidaste tu contraseña?</label>
+          <a href="#" style="font-size:0.85rem;color:#ff66a8;text-decoration:none;" onclick="alert('La contraseña ES 12345 ')">Sí! La olvidé!</a>
+        </div>
+
+        <!-- IMPORTANT: type="button" to avoid default form submit -->
+        <button id="login-submit" class="btn primary" type="button">
+          <i class="fas fa-sign-in-alt"></i> Ingresar
+        </button>
+      </div>
+
+      <div class="divider">or</div>
+      <div class="social-login">
+  <div class="social">
+    <i onclick="window.location.href='index.html'" class="fas fa-calendar" title="Reservar Cita"></i>
+  </div>
+  <div class="social">
+    <i   class="fab fa-instagram" title="Ir a Instagram"></i>
+  </div>
+  <div class="social">
+    <i   class="fab fa-facebook-f" title="Ir a Facebook"></i>
+  </div>
+</div>
+
+    </div>
+
+    <!-- right: visuals / bubbles (keeps your apple-style layout) -->
+    <div class="login-right" aria-hidden="true">
+  <img src="images/logo.png" alt="Logo" class="login-logo">
+</div>
+
+
+    <!-- close button -->
+    <button class="modal-close" id="login-close" title="Cerrar" style="position:absolute;top:14px;right:14px;">
+      <!-- <i class="fas fa-times"></i> -->
+    </button>
+  </div>
+</div>
+
+
+
+  <!-- 🌸 LOADING OVERLAY -->
+<div id="loading-overlay" class="hidden">
+  <div class="spinner"></div>
+  <p>Cargando...</p>
+</div>
+
+
+  <!-- ⚙️ PANEL ADMINISTRATIVO -->
+  <section id="admin-panel" class="admin-panel hidden"></section>
+
+  <!-- SweetAlert -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+const ADMIN_USER = "admin@coquette";
+const ADMIN_PASS = "12345";
+const API_URL = "https://script.google.com/macros/s/AKfycbzwfBw1eusC4uwJdHLq8gLmx5BF6bYgn-ako9XUA7HXkyq5NQETzqsCNDNDjLLNFSYi/exec";
+
+const loginModal = document.getElementById("login-modal");
+const loginSubmit = document.getElementById("login-submit");
+const loginClose = document.getElementById("login-close");
+const adminPanel = document.getElementById("admin-panel");
+
+loginClose.addEventListener("click", () => hideModal());
+loginSubmit.addEventListener("click", loginHandler);
+window.addEventListener("DOMContentLoaded", () => {
+  const logged = localStorage.getItem("admin_logged") === "true";
+  if (logged) {
+    hideModal();
+    renderAdminPanel();
+    setInterval(checkForNewCitas, 10000);
+  } else {
+    showModal();
+  }
+});
+
+
+function loginHandler() {
+  const user = document.getElementById("admin-user").value.trim();
+  const pass = document.getElementById("admin-pass").value.trim();
+  if (user === ADMIN_USER && pass === ADMIN_PASS) {
+    localStorage.setItem("admin_logged", "true");
+    Swal.fire({ icon:"success", title:"Bienvenido", text:"Acceso concedido al panel administrativo", timer:1200, showConfirmButton:false})
+      .then(() => { hideModal(); renderAdminPanel(); });
+  } else {
+    Swal.fire({ icon:"error", title:"Error", text:"Credenciales incorrectas" });
+  }
+}
+
+function showModal() { loginModal.classList.remove("hidden"); setTimeout(()=>loginModal.classList.add("visible"),20);}
+function hideModal() { loginModal.classList.remove("visible"); setTimeout(()=>loginModal.classList.add("hidden"),400);}
+
+function formatDate(fecha){
+  if(!fecha) return "";
+  let d;
+  if(fecha.includes("/")){ const [day,month,year]=fecha.split("/").map(Number); d=new Date(year,month-1,day);}
+  else if(fecha.includes("-")) d=new Date(fecha); else return fecha;
+  return d.toLocaleDateString("es-ES",{ weekday:"short", day:"2-digit", month:"short", year:"numeric"}).replace(".","");
+}
+
+function formatTime(timeStr){
+  if(!timeStr) return "";
+  if(typeof timeStr === "number"){
+    const totalMinutes = Math.round(timeStr*24*60);
+    let hour = Math.floor(totalMinutes/60);
+    let minute = totalMinutes%60;
+    const ampm = hour>=12 ? "PM":"AM";
+    hour = hour%12||12;
+    return `${hour}:${minute.toString().padStart(2,"0")} ${ampm}`;
+  }
+  if(typeof timeStr === "string" && timeStr.includes("T")){
+    const d = new Date(timeStr);
+    let hour = d.getHours();
+    let minute = d.getMinutes();
+    const ampm = hour>=12 ? "PM":"AM";
+    hour = hour%12||12;
+    return `${hour}:${minute.toString().padStart(2,"0")} ${ampm}`;
+  }
+  if(typeof timeStr === "string" && timeStr.includes(":")){
+    let [hour,minute]=timeStr.split(":").map(Number);
+    const ampm = hour>=12 ? "PM":"AM";
+    hour = hour%12||12;
+    return `${hour}:${minute.toString().padStart(2,"0")} ${ampm}`;
+  }
+  return timeStr;
+}
+
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+let allCitas = [];
+
+function renderAdminPanel() {
+  adminPanel.classList.remove("hidden");
+  adminPanel.innerHTML = `
+  <div class="admin-shell">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="logo">RB</div>
+      <nav>
+        <a href="index.html" class="active"><i class="fas fa-chart-line"></i></a>
+        <a><i class="fas fa-user-friends"></i></a>
+        <a><i class="fas fa-calendar"></i></a>
+        <a><i class="fas fa-envelope"></i></a>
+        <a><i class="fas fa-cog"></i></a>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="main">
+      <!-- Top Bar -->
+      <div class="topbar">
+        <div class="left">
+          <div class="title"><img src="images/logo.png" alt="avatar"/></div>
+        </div>
+        <div class="controls">
+          <input id="search-input" type="search" placeholder="🔍 Buscar por cliente, servicio o fecha...">
+          <div class="user">
+            <div class="meta">
+              <strong>Administrador</strong>
+              <div style="font-size:0.78rem;color:var(--muted-2)">La Coquette</div>
+            </div>
+            <img src="images/favicon.jpg" alt="avatar"/>
+          </div>
+          <button id="panel-close-btn" class="modal-close" title="Cerrar panel">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenido -->
+      <div class="content">
+        <!-- Panel izquierdo -->
+        <section class="left-panel">
+          <h3>Resumen</h3>
+          <div class="admin-kpis">
+            <div class="kpi-card"><h3>Citas Hoy</h3><p id="kpi-hoy">--</p></div>
+            <div class="kpi-card"><h3>Total Citas</h3><p id="kpi-total">--</p></div>
+            <div class="kpi-card"><h3>Clientes</h3><p id="kpi-clientes">--</p></div>
+          </div>
+
+          <div style="text-align:center;margin-top:1rem;">
+            <button id="delete-past-btn" class="btn primary">🗑️ Eliminar pasadas</button>
+          </div>
+          <div style="text-align:center;margin-top:0.5rem;">
+            <button id="logout-btn" class="btn primary" style="background:linear-gradient(90deg,#ff8fa0,#ff637f);color:white;">Cerrar sesión</button>
+          </div>
+        </section>
+
+        <!-- Panel derecho (Calendario) -->
+        <section class="calendar-shell">
+          <div class="calendar-controls" style="text-align:center;margin-bottom:1rem;">
+            <button id="prev-month" class="month-btn">◀</button>
+            <span id="current-month-label" style="font-weight:bold;margin:0 1rem;"></span>
+            <button id="next-month" class="month-btn">▶</button>
+          </div>
+          <div id="calendar-container" class="calendar-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px;padding:10px;"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+  `;
+
+  // 🔹 Listeners esenciales
+  document.getElementById("panel-close-btn").onclick = () => closePanel(true);
+  document.getElementById("logout-btn").onclick = logout;
+  document.getElementById("prev-month").onclick = () => changeMonth(-1);
+  document.getElementById("next-month").onclick = () => changeMonth(1);
+
+  // 🔹 Reutiliza tu mismo listener de eliminación (ya está en tu script global)
+  document.getElementById("delete-past-btn").onclick = () => {
+    const evt = new Event("click");
+    evt.target = { id: "delete-past-btn" };
+    document.dispatchEvent(evt);
+  };
+
+  // 🔹 Estilo de los botones de mes (idéntico al anterior)
+  document.querySelectorAll(".month-btn").forEach(b => {
+    b.style.padding = "5px 12px";
+    b.style.border = "none";
+    b.style.background = "#1e3a8a";
+    b.style.color = "white";
+    b.style.borderRadius = "6px";
+    b.style.cursor = "pointer";
+  });
+
+  // 🔹 Mostrar loader antes de cargar datos
+const calendarContainer = document.getElementById("calendar-container");
+calendarContainer.innerHTML = `<div class="calendar-loader"></div>`;
+
+
+  // 🔹 Carga de datos (igual que antes, sin cambiar la lógica)
+  fetch(`${API_URL}?action=listar`)
+    .then(res => res.json())
+    .then(json => {
+      if (!json.ok) throw new Error("Respuesta no OK");
+      allCitas = json.data || [];
+
+      if (allCitas.length) {
+        const ultCita = allCitas[allCitas.length - 1];
+        lastKnownTimestamp = new Date(ultCita.CREADO_AT).getTime();
+      }
+
+      // 🔹 Usamos tus mismas funciones ya definidas
+      updateKPIs(allCitas);
+      renderCitasCalendar(allCitas);
+      setupSearch(allCitas);
+    })
+    .catch(() => {
+      document.getElementById("calendar-container").innerHTML =
+        "<p>⚠️ Error al cargar datos</p>";
+    });
+}
+
+function updateKPIs(citas){
+  const hoyStr = new Date().toISOString().split("T")[0];
+  document.getElementById("kpi-total").textContent = citas.length;
+  document.getElementById("kpi-hoy").textContent = citas.filter(c=>c.FECHA===hoyStr).length;
+  document.getElementById("kpi-clientes").textContent = new Set(citas.map(c=>c.NOMBRE)).size;
+}
+
+let lastKnownTimestamp = 0;
+let checkingUpdates = false;
+
+async function checkForNewCitas() {
+  if (checkingUpdates) return;
+  checkingUpdates = true;
+  try {
+    const res = await fetch(`${API_URL}?action=lastModified`);
+    const json = await res.json();
+    if (json.ok) {
+      const newTimestamp = json.lastModified;
+      if (lastKnownTimestamp && newTimestamp > lastKnownTimestamp) {
+        showLoading();
+        await fetchCitasYRender();
+        hideLoading();
+      }
+      lastKnownTimestamp = newTimestamp;
+    }
+  } catch (err) { console.error("Error verificando actualizaciones:", err); }
+  checkingUpdates = false;
+}
+
+function renderCitasCalendar(citas) {
+  const container = document.getElementById("calendar-container");
+  if (!citas.length) { console.warn("No hay citas registradas, mostrando calendario vacío."); }
+
+  const citasPorFecha = {};
+  citas.forEach(c => {
+    if (!c.FECHA) return;
+    const key = new Date(c.FECHA).toISOString().split("T")[0];
+    if (!citasPorFecha[key]) citasPorFecha[key] = [];
+    citasPorFecha[key].push(c);
+  });
+
+  const firstDay = new Date(currentYear, currentMonth, 1);
+  const lastDay = new Date(currentYear, currentMonth+1,0);
+  document.getElementById("current-month-label").textContent = firstDay.toLocaleDateString('es-ES',{ month:'long', year:'numeric' });
+
+  let html="";
+  for(let i=0;i<firstDay.getDay();i++) html+=`<div></div>`;
+
+  for(let d=1;d<=lastDay.getDate();d++){
+    const date = new Date(currentYear,currentMonth,d);
+    const key = date.toISOString().split("T")[0];
+    let citasDia = citasPorFecha[key] || [];
+    citasDia.sort((a,b)=>getMinutesFromTimeStr(formatTime(a.HORA))-getMinutesFromTimeStr(formatTime(b.HORA)));
+
+    const today=new Date(); today.setHours(0,0,0,0);
+    const isPast = date < today;
+
+    html+=`<div class="day-box" style="border:1px solid #ccc;border-radius:8px;padding:5px;min-height:80px;background:${isPast?'#a5b4fc':'#ff9dbb'};color:${isPast?'black':'white'}">
+      <div style="font-weight:bold;margin-bottom:5px;">${d} ${date.toLocaleDateString('es-ES',{ weekday:'short'})}</div>
+      ${citasDia.map(c=>`<div style="background:#000000;margin:2px 0;padding:2px 4px;border-radius:4px;font-size:0.85em;cursor:pointer" onclick="deleteCitaPrompt('${c.ID}','${c.NOMBRE}')">
+        <strong>${formatTime(c.HORA)}</strong> - ${c.SERVICIO||''}<br>${c.NOMBRE||''} (${c.BARBERO||''})
+      </div>`).join("")}
+    </div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function deleteCitaPrompt(id,nombre){
+  Swal.fire({ title:`¿Eliminar la cita de ${nombre}?`, icon:'warning', showCancelButton:true, confirmButtonText:'Sí, eliminar', cancelButtonText:'Cancelar' })
+  .then(res=>{
+    if(res.isConfirmed){
+      showLoading();
+      fetch(`${API_URL}?action=delete&id=${id}`)
+        .then(r=>r.json())
+        .then(json=>{
+          if(json.ok){ Swal.fire({icon:'success',title:'Cita eliminada',timer:1000,showConfirmButton:false}); fetchCitasYRender(); }
+          else Swal.fire({icon:'error',title:'Error al eliminar'});
+        })
+        .catch(()=>Swal.fire({icon:'error',title:'Error de conexión'}))
+        .finally(()=>hideLoading());
+    }
+  });
+}
+
+function getMinutesFromTimeStr(timeStr){
+  if(!timeStr) return 0;
+  const match=timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+  if(!match) return 0;
+  let hour=parseInt(match[1],10);
+  const minute=parseInt(match[2],10);
+  const ampm=match[3].toUpperCase();
+  if(ampm==="PM" && hour!==12) hour+=12;
+  if(ampm==="AM" && hour===12) hour=0;
+  return hour*60+minute;
+}
+
+function changeMonth(offset){
+  currentMonth+=offset;
+  if(currentMonth<0){ currentMonth=11; currentYear--; }
+  if(currentMonth>11){ currentMonth=0; currentYear++; }
+  renderCitasCalendar(allCitas);
+}
+
+function setupSearch(citas){
+  const input=document.getElementById("search-input");
+  input.addEventListener("input", e=>{
+    const term=e.target.value.toLowerCase();
+    const filtered=citas.filter(c=>{
+      const nombre=c.NOMBRE?.toLowerCase()||"";
+      const telefono=c.TELEFONO?.toLowerCase()||"";
+      const servicio=c.SERVICIO?.toLowerCase()||"";
+      const fecha=formatDate(c.FECHA)?.toLowerCase()||"";
+      const hora=formatTime(c.HORA)?.toLowerCase()||"";
+      const barbero=c.BARBERO?.toLowerCase()||"";
+      return nombre.includes(term)||telefono.includes(term)||servicio.includes(term)||fecha.includes(term)||hora.includes(term)||barbero.includes(term);
+    });
+    renderCitasCalendar(filtered);
+  });
+}
+
+function logout(){
+  Swal.fire({title:"¿Cerrar sesión?",text:"Deberás iniciar sesión nuevamente.",icon:"warning",showCancelButton:true,confirmButtonText:"Sí, cerrar",cancelButtonText:"Cancelar"})
+    .then(res=>{if(res.isConfirmed){ localStorage.removeItem("admin_logged"); closePanel(); Swal.fire({icon:"success",title:"Sesión cerrada",timer:1200,showConfirmButton:false}); setTimeout(showModal,600); }});
+}
+
+function closePanel(fromX=false){ adminPanel.classList.add("hidden"); adminPanel.innerHTML=""; if(!fromX) localStorage.removeItem("admin_logged"); }
+
+function fetchCitasYRender(){
+  showLoading();
+  fetch(`${API_URL}?action=listar`)
+    .then(res=>res.json())
+    .then(json=>{
+      if(!json.ok) throw new Error("Error al listar");
+      allCitas=json.data||[];
+      if(allCitas.length){
+        const ultCita = allCitas[allCitas.length-1];
+        lastKnownTimestamp = new Date(ultCita.CREADO_AT).getTime();
+      }
+      updateKPIs(allCitas);
+      renderCitasCalendar(allCitas);
+    })
+    .catch(err=>{console.error(err); Swal.fire({icon:'error',title:'Error al actualizar citas'});})
+    .finally(()=>hideLoading());
+}
+
+function showLoading(){ document.getElementById("loading-overlay").classList.remove("hidden"); }
+function hideLoading(){ document.getElementById("loading-overlay").classList.add("hidden"); }
+
+// Botón eliminar todas las pasadas
+document.addEventListener("click",e=>{
+  if(e.target?.id==="delete-past-btn"){
+    Swal.fire({ title:'¿Eliminar todas las citas pasadas?', text:"Esta acción no se puede deshacer", icon:'warning', showCancelButton:true, confirmButtonText:'Sí, eliminar', cancelButtonText:'Cancelar' })
+    .then(res=>{
+      if(res.isConfirmed){
+        showLoading();
+        fetch(`${API_URL}?action=deletePast`)
+          .then(r=>r.json())
+          .then(json=>{
+            if(json.ok){ Swal.fire({icon:'success',title:'Citas pasadas eliminadas',timer:1200,showConfirmButton:false}); fetchCitasYRender(); }
+            else Swal.fire({icon:'error',title:'Error al eliminar'});
+          })
+          .finally(()=>hideLoading());
+      }
+    });
+  }
+});
+
+
+
+
+
+</script>
+</body>
+</html>

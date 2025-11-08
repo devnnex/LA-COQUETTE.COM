@@ -388,7 +388,23 @@ function renderBookingStep() {
       const data = await res.json();
 
       state.selectedBarberWhatsapp = data.whatsapp || null;
-      data.slots = [...new Set(data.slots.filter(s => !!s))]; // limpia duplicados y vacíos
+      
+      // 🔹 Limpiar duplicados y vacíos
+data.slots = [...new Set(data.slots.filter(s => !!s))];
+
+// 🔹 Filtrar las horas pasadas solo si es el día actual
+const now = new Date();
+const isToday = dateToYMD(date) === dateToYMD(now);
+
+if (isToday) {
+  const currentTime = now.getHours() * 60 + now.getMinutes(); // minutos actuales
+  data.slots = data.slots.filter(slot => {
+    const [h, m] = slot.split(':').map(Number);
+    const slotMinutes = h * 60 + (m || 0);
+    return slotMinutes > currentTime; // solo mostrar las horas futuras
+  });
+}
+
 
       grid.innerHTML = '';
 

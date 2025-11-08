@@ -388,20 +388,48 @@ function renderBookingStep() {
       const data = await res.json();
 
       state.selectedBarberWhatsapp = data.whatsapp || null;
-      
       // 🔹 Limpiar duplicados y vacíos
 data.slots = [...new Set(data.slots.filter(s => !!s))];
 
-// 🔹 Filtrar las horas pasadas solo si es el día actual
+// 🔹 Determinar si es el día actual
 const now = new Date();
 const isToday = dateToYMD(date) === dateToYMD(now);
 
 if (isToday) {
-  const currentTime = now.getHours() * 60 + now.getMinutes(); // minutos actuales
+  // Obtener la hora actual de Bogotá 🇨🇴
+  const bogotaNow = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "America/Bogota" })
+  );
+  const currentMinutes = bogotaNow.getHours() * 60 + bogotaNow.getMinutes();
+
+  // 🔹 Función robusta para convertir "hora" a minutos
+  const parseTimeToMinutes = (timeStr) => {
+    if (!timeStr) return NaN;
+    let str = timeStr.trim().toUpperCase();
+
+    // Detectar formato AM/PM
+    const isPM = str.includes("PM");
+    const isAM = str.includes("AM");
+
+    // Quitar AM/PM para parsear números
+    str = str.replace(/AM|PM/g, "").trim();
+
+    let [h, m] = str.split(":").map(n => parseInt(n, 10));
+    if (isNaN(h)) return NaN;
+    if (isNaN(m)) m = 0;
+
+    // Ajustar formato 12h
+    if (isPM && h < 12) h += 12;
+    if (isAM && h === 12) h = 0;
+
+    return h * 60 + m;
+  };
+
+  // 🔹 Filtrar slots que aún no han pasado
   data.slots = data.slots.filter(slot => {
-    const [h, m] = slot.split(':').map(Number);
-    const slotMinutes = h * 60 + (m || 0);
-    return slotMinutes > currentTime; // solo mostrar las horas futuras
+    const slotMinutes = parseTimeToMinutes(slot);
+    if (isNaN(slotMinutes)) return true; // si no se pudo interpretar, lo dejamos visible
+    return slotMinutes >= currentMinutes;
   });
 }
 
